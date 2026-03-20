@@ -1,0 +1,257 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  margin: 1rem 2rem 0 2rem;
+  border-radius: var(--radius-lg);
+}
+
+.navbar-brand-mobile {
+  display: none;
+  align-items: center;
+  gap: 1rem;
+}
+
+.menu-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.menu-btn:hover {
+  color: var(--primary);
+}
+
+.navbar-brand-mobile h2 {
+  font-weight: 700;
+  color: white;
+  font-size: 1.25rem;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.user-profile-menu {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.notification-container {
+  position: relative;
+  margin-right: 1.5rem;
+}
+
+.notification-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+  color: var(--text-secondary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+}
+
+.notification-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--danger);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  height: 18px;
+  width: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid var(--bg-secondary);
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: 55px;
+  right: 0;
+  width: 350px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+  z-index: 9999;
+  overflow: hidden;
+  color: #333333;
+  transform-origin: top right;
+  animation: slideDownFade 0.3s ease-out forwards;
+}
+
+@keyframes slideDownFade {
+  from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.dropdown-header h3 {
+  font-size: 1.1rem;
+  margin: 0;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.mark-all-btn {
+  background: none;
+  border: none;
+  color: #4f46e5;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mark-all-btn:hover { text-decoration: underline; color: #4338ca; }
+
+.dropdown-body {
+  max-height: 350px;
+  overflow-y: auto;
+  background: #ffffff;
+}
+
+.dropdown-body::-webkit-scrollbar {
+  width: 6px;
+}
+.dropdown-body::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
+}
+
+.no-notifications {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.notification-item:hover {
+  background: #f8fafc;
+}
+
+.notification-item.unread {
+  background: #eff6ff;
+}
+
+.notif-content {
+  flex: 1;
+}
+
+.notif-content p {
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.notification-item.unread .notif-content p {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.notif-time {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.unread-dot {
+  width: 10px;
+  height: 10px;
+  background: #4f46e5;
+  border-radius: 50%;
+  margin-left: 0.5rem;
+  box-shadow: 0 0 6px rgba(79, 70, 229, 0.4);
+}
+
+.dropdown-footer {
+  padding: 0.8rem;
+  text-align: center;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.dropdown-footer a {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4f46e5;
+  text-decoration: none;
+}
+.dropdown-footer a:hover {
+  text-decoration: underline;
+}
+
+.avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--primary);
+}
+
+.avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: white;
+}
+
+.navbar-user-name {
+  font-weight: 500;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem;
+    margin: 1rem 1rem 0 1rem;
+  }
+  .navbar-brand-mobile {
+    display: flex;
+  }
+}
