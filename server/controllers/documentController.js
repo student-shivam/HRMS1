@@ -6,6 +6,7 @@ const Employee = require('../models/Employee');
 const Document = require('../models/Document');
 const User = require('../models/User');
 const { encryptText, decryptText } = require('../utils/documentCrypto');
+const APP_NAME = process.env.APP_NAME || 'RavindraNexus';
 
 const uploadsRoot = path.join(__dirname, '..', 'uploads');
 const secureDocumentsRoot = path.join(__dirname, '..', 'uploads', 'documents');
@@ -179,14 +180,14 @@ const buildOfferLetterHtml = ({
 <body>
   <div class="page">
     <div class="letterhead">
-      <h1>BROTHERS IT SOLUTION</h1>
-      <p>Near Main Market, Basti - 272124, Uttar Pradesh, India</p>
-      <p>+91 98765 43210 | hr@brothersitsolution.com</p>
+      <h1>${APP_NAME}</h1>
+      <p>Corporate Office, India</p>
+      <p>support@ravindranexus.com | www.ravindranexus.com</p>
     </div>
 
     <div class="meta">
       <div class="meta-row">
-        <div class="meta-cell"><strong>Ref No:</strong> BITS/OFFER/${new Date().getFullYear()}/${Math.floor(1000 + Math.random() * 9000)}</div>
+        <div class="meta-cell"><strong>Ref No:</strong> RNX/OFFER/${new Date().getFullYear()}/${Math.floor(1000 + Math.random() * 9000)}</div>
         <div class="meta-cell meta-right"><strong>Date:</strong> ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
       </div>
     </div>
@@ -201,7 +202,7 @@ const buildOfferLetterHtml = ({
 
     <p>Dear <strong>${firstName}</strong>,</p>
 
-    <p>We are pleased to offer you the position of <strong>${employeeRole}</strong> in the <strong>${departmentName}</strong> department at <strong>Brothers IT Solution</strong>. Your date of joining will be <strong>${formattedJoiningDate}</strong>, subject to completion of joining formalities, submission of required documents, and verification as per company policy.</p>
+    <p>We are pleased to offer you the position of <strong>${employeeRole}</strong> in the <strong>${departmentName}</strong> department at <strong>${APP_NAME}</strong>. Your date of joining will be <strong>${formattedJoiningDate}</strong>, subject to completion of joining formalities, submission of required documents, and verification as per company policy.</p>
 
     <p>Your annual gross compensation will be <strong>${formattedSalary}</strong>. The salary structure, statutory components, reimbursements, and other benefits applicable to your role will be administered in accordance with prevailing company policy and applicable law.</p>
 
@@ -222,7 +223,7 @@ const buildOfferLetterHtml = ({
 
     <div class="signature-wrap">
       <div class="signature-col">
-        <div class="signature-label">For Brothers IT Solution</div>
+        <div class="signature-label">For ${APP_NAME}</div>
         <div><strong>${hrName}</strong></div>
         <div class="muted">Human Resources</div>
         <div class="muted">Authorized Signatory</div>
@@ -256,7 +257,7 @@ exports.generateOfferLetter = async (req, res) => {
 
     const linkedUser = await User.findOne({ email: employee.email });
     if (!linkedUser) {
-      return res.status(404).json({ success: false, message: 'No HRMS user account is linked to this employee email' });
+      return res.status(404).json({ success: false, message: `No ${APP_NAME} user account is linked to this employee email` });
     }
 
     const hrName = req.user?.name || '[HR Name]';

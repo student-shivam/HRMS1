@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import api, { API_BASE_URL, getApiErrorMessage } from '../../utils/api';
+import { APP_NAME, APP_TAGLINE } from '../../utils/branding';
 
 const GenerateDocument = () => {
   const { user } = useSelector((state) => state.auth);
@@ -90,7 +91,7 @@ const GenerateDocument = () => {
       <div className="dashboard-header" style={{ marginBottom: '1.5rem' }}>
         <div>
           <h1 className="dashboard-title">Offer Letter Generator</h1>
-          <p className="dashboard-subtitle">Generate a clean, print-ready employment offer letter for selected employees.</p>
+          <p className="dashboard-subtitle">Generate a clean, print-ready {APP_NAME} employment offer letter.</p>
         </div>
       </div>
 
@@ -179,13 +180,13 @@ const GenerateDocument = () => {
             }}
           >
             <div style={{ textAlign: 'center', borderBottom: '1.5px solid #1f2937', paddingBottom: '12px', marginBottom: '18px' }}>
-              <h1 style={{ color: '#111827', fontSize: '22px', fontWeight: '700', margin: 0, letterSpacing: '0.8px' }}>BROTHERS IT SOLUTION</h1>
-              <p style={{ margin: '4px 0 2px', fontSize: '12px', color: '#4b5563' }}>Near Main Market, Basti - 272124, Uttar Pradesh, India</p>
-              <p style={{ margin: 0, fontSize: '12px', color: '#4b5563' }}>+91 98765 43210 | hr@brothersitsolution.com</p>
+              <h1 style={{ color: '#111827', fontSize: '22px', fontWeight: '700', margin: 0, letterSpacing: '0.8px' }}>{APP_NAME}</h1>
+              <p style={{ margin: '4px 0 2px', fontSize: '12px', color: '#4b5563' }}>{APP_TAGLINE}</p>
+              <p style={{ margin: 0, fontSize: '12px', color: '#4b5563' }}>support@ravindranexus.com | www.ravindranexus.com</p>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px', fontSize: '12px' }}>
-              <p style={{ margin: 0 }}><strong>Ref No:</strong> BITS/OFFER/{new Date().getFullYear()}/{Math.floor(1000 + Math.random() * 9000)}</p>
+              <p style={{ margin: 0 }}><strong>Ref No:</strong> RNX/OFFER/{new Date().getFullYear()}/{Math.floor(1000 + Math.random() * 9000)}</p>
               <p style={{ margin: 0 }}><strong>Date:</strong> {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
             </div>
 
@@ -202,7 +203,7 @@ const GenerateDocument = () => {
             <p style={{ margin: '0 0 10px' }}>Dear <strong>{firstName}</strong>,</p>
 
             <p style={{ margin: '0 0 10px', textAlign: 'justify' }}>
-              We are pleased to offer you the position of <strong>{employeeRole}</strong> in the <strong>{departmentName}</strong> department at <strong>Brothers IT Solution</strong>. Your date of joining will be <strong>{formattedJoiningDate}</strong>, subject to completion of joining formalities, submission of required documents, and verification as per company policy.
+              We are pleased to offer you the position of <strong>{employeeRole}</strong> in the <strong>{departmentName}</strong> department at <strong>{APP_NAME}</strong>. Your date of joining will be <strong>{formattedJoiningDate}</strong>, subject to completion of joining formalities, submission of required documents, and verification as per company policy.
             </p>
 
             <p style={{ margin: '0 0 10px', textAlign: 'justify' }}>
@@ -234,7 +235,7 @@ const GenerateDocument = () => {
 
             <div style={{ marginTop: '18px', display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
               <div style={{ width: '48%' }}>
-                <p style={{ margin: '0 0 24px' }}><strong>For Brothers IT Solution</strong></p>
+                <p style={{ margin: '0 0 24px' }}><strong>For {APP_NAME}</strong></p>
                 <p style={{ margin: '0 0 2px', fontWeight: '700' }}>{hrName}</p>
                 <p style={{ margin: '0 0 2px' }}>Human Resources</p>
                 <p style={{ margin: 0 }}>Authorized Signatory</p>

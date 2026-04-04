@@ -1,14 +1,24 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import api, { API_BASE_URL, ASSET_BASE_URL, getApiErrorMessage } from '../../utils/api';
-import { setUser } from '../../store/slices/authSlice';
+import { logout, setUser } from '../../store/slices/authSlice';
 import '../admin/Admin.css';
+import { APP_NAME } from '../../utils/branding';
 
-const tabs = ['About', 'Skills', 'Experience', 'Documents', 'Performance'];
+const allTabs = ['About', 'Skills', 'Experience', 'Documents', 'Performance'];
 
-const starLabel = (rating) => Array.from({ length: 5 }, (_, index) => (
-  <span key={index} style={{ color: index < rating ? '#fbbf24' : 'rgba(255,255,255,0.18)', fontSize: '1.1rem' }}>★</span>
+const renderStars = (rating) => Array.from({ length: 5 }, (_, index) => (
+  <span
+    key={index}
+    style={{
+      color: index < rating ? '#fbbf24' : 'rgba(255,255,255,0.18)',
+      fontSize: '1.05rem',
+      letterSpacing: '0.08em'
+    }}
+  >
+    *
+  </span>
 ));
 
 const formatDate = (value) => {
@@ -16,8 +26,16 @@ const formatDate = (value) => {
   return new Date(value).toLocaleDateString([], { month: 'short', year: 'numeric' });
 };
 
+const resolveProfileImage = (value) => {
+  if (!value) return '';
+  if (/^https?:\/\//i.test(value)) return value;
+  if (value.startsWith('/')) return `${ASSET_BASE_URL}${value}`;
+  return `${ASSET_BASE_URL}/uploads/${value}`;
+};
+
 const Profile = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { id } = useParams();
   const { user: authUser } = useSelector((state) => state.auth);
   const [profile, setProfile] = useState(null);
@@ -49,8 +67,19 @@ const Profile = () => {
   const [profileImagePreview, setProfileImagePreview] = useState('');
 
   const isOwnProfile = !id || String(id) === String(authUser?._id || authUser?.id);
-  const canEdit = Boolean(profile) && (isOwnProfile || authUser?.role === 'admin');
   const isAdminView = authUser?.role === 'admin';
+  const isAdminSelfProfile = isAdminView && isOwnProfile;
+  const canEdit = Boolean(profile) && (isOwnProfile || isAdminView);
+
+  const visibleTabs = useMemo(() => (
+    isAdminSelfProfile ? ['About'] : allTabs
+  ), [isAdminSelfProfile]);
+
+  const completionTone = useMemo(() => {
+    if ((profile?.profileCompletion || 0) >= 80) return 'var(--success)';
+    if ((profile?.profileCompletion || 0) >= 50) return 'var(--warning)';
+    return 'var(--secondary)';
+  }, [profile?.profileCompletion]);
 
   const fetchProfile = async () => {
     setLoading(true);
@@ -58,6 +87,7 @@ const Profile = () => {
       const endpoint = id ? `/profile/${id}` : '/profile/me';
       const res = await api.get(endpoint);
       const nextProfile = res.data.data;
+
       setProfile(nextProfile);
       setEditForm({
         name: nextProfile.name || '',
@@ -71,7 +101,7 @@ const Profile = () => {
         taskCompletion: nextProfile.performance?.taskCompletion || 0,
         adminNotes: nextProfile.performance?.notes || ''
       });
-      setProfileImagePreview(nextProfile.profileImage ? `${ASSET_BASE_URL}${nextProfile.profileImage}` : '');
+      setProfileImagePreview(resolveProfileImage(nextProfile.profileImage || nextProfile.avatar));
       setError('');
     } catch (err) {
       setError(getApiErrorMessage(err, 'Failed to load profile'));
@@ -84,10 +114,22 @@ const Profile = () => {
     fetchProfile();
   }, [id]);
 
+  useEffect(() => {
+    if (!visibleTabs.includes(activeTab)) {
+      setActiveTab(visibleTabs[0]);
+    }
+  }, [visibleTabs, activeTab]);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/login');
+  };
+
   const handleProfileSave = async (event) => {
     event.preventDefault();
     try {
       setStatusMsg({ type: 'loading', text: 'Saving profile...' });
+
       const formData = new FormData();
       const payload = isOwnProfile ? {} : { userId: profile._id };
 
@@ -97,10 +139,12 @@ const Profile = () => {
         }
       });
 
-      const skills = Array.isArray(profile?.skills) ? profile.skills : [];
-      payload.skills = skills.join(',');
+      payload.skills = Array.isArray(profile?.skills) ? profile.skills.join(',') : '';
 
-      Object.entries(payload).forEach(([key, value]) => formData.append(key, value));
+      Object.entries(payload).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+
       if (profileImageFile) {
         formData.append('profileImage', profileImageFile);
       }
@@ -112,9 +156,10 @@ const Profile = () => {
       if (isOwnProfile) {
         dispatch(setUser(res.data.data));
       }
+
       setStatusMsg({ type: 'success', text: 'Profile updated successfully.' });
       setProfileImageFile(null);
-      fetchProfile();
+      await fetchProfile();
     } catch (err) {
       setStatusMsg({ type: 'error', text: getApiErrorMessage(err, 'Failed to update profile') });
     }
@@ -123,6 +168,7 @@ const Profile = () => {
   const handleAddSkill = () => {
     const skill = selectedSkill.trim();
     if (!skill) return;
+
     setProfile((prev) => ({
       ...prev,
       skills: Array.from(new Set([...(prev?.skills || []), skill]))
@@ -145,7 +191,7 @@ const Profile = () => {
         skills: profile.skills
       });
       setStatusMsg({ type: 'success', text: 'Skills updated.' });
-      fetchProfile();
+      await fetchProfile();
     } catch (err) {
       setStatusMsg({ type: 'error', text: getApiErrorMessage(err, 'Failed to save skills') });
     }
@@ -159,9 +205,15 @@ const Profile = () => {
         userId: profile._id,
         ...experienceForm
       });
-      setExperienceForm({ company: '', role: '', startDate: '', endDate: '', description: '' });
+      setExperienceForm({
+        company: '',
+        role: '',
+        startDate: '',
+        endDate: '',
+        description: ''
+      });
       setStatusMsg({ type: 'success', text: 'Experience added.' });
-      fetchProfile();
+      await fetchProfile();
     } catch (err) {
       setStatusMsg({ type: 'error', text: getApiErrorMessage(err, 'Failed to add experience') });
     }
@@ -170,7 +222,7 @@ const Profile = () => {
   const handleDeleteExperience = async (experienceId) => {
     try {
       await api.delete(`/profile/delete-experience/${experienceId}?userId=${profile._id}`);
-      fetchProfile();
+      await fetchProfile();
     } catch (err) {
       setStatusMsg({ type: 'error', text: getApiErrorMessage(err, 'Failed to remove experience') });
     }
@@ -189,10 +241,10 @@ const Profile = () => {
 
       const blob = await response.blob();
       const objectUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = objectUrl;
 
       if (downloadName) {
+        const link = document.createElement('a');
+        link.href = objectUrl;
         link.download = downloadName;
         document.body.appendChild(link);
         link.click();
@@ -214,12 +266,6 @@ const Profile = () => {
     setProfileImagePreview(URL.createObjectURL(file));
   };
 
-  const completionTone = useMemo(() => {
-    if ((profile?.profileCompletion || 0) >= 80) return 'var(--success)';
-    if ((profile?.profileCompletion || 0) >= 50) return 'var(--warning)';
-    return 'var(--secondary)';
-  }, [profile?.profileCompletion]);
-
   if (loading) {
     return <div className="spinner-container"><div className="spinner"></div></div>;
   }
@@ -238,11 +284,31 @@ const Profile = () => {
       <div className="dashboard-header" style={{ marginBottom: '1.5rem' }}>
         <div>
           <h1 className="dashboard-title">{isOwnProfile ? 'My Profile' : 'Employee Profile'}</h1>
-          <p className="dashboard-subtitle">Professional HRMS profile with skills, experience, documents, and performance.</p>
+          <p className="dashboard-subtitle">
+            {isAdminSelfProfile
+              ? 'Manage your admin identity and core account details.'
+              : `Professional ${APP_NAME} profile with skills, experience, documents, and performance.`}
+          </p>
         </div>
-        {!isOwnProfile && isAdminView ? (
-          <Link to="/admin/employees" className="btn btn-secondary">Back to Employees</Link>
-        ) : null}
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {!isOwnProfile && isAdminView ? (
+            <Link to="/admin/employees" className="btn btn-secondary">Back to Employees</Link>
+          ) : null}
+          {isOwnProfile ? (
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleLogout}
+              style={{
+                borderColor: 'rgba(248, 113, 113, 0.28)',
+                color: '#fecaca',
+                background: 'rgba(239, 68, 68, 0.1)'
+              }}
+            >
+              Logout
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div className="profile-grid">
@@ -258,7 +324,10 @@ const Profile = () => {
             <div className="profile-hero-copy">
               <h2>{profile.name}</h2>
               <p>{profile.designation || profile.role}</p>
-              <span>{profile.department || 'Department not assigned'}</span>
+              <span>{isAdminSelfProfile ? 'Administrator Account' : (profile.department || 'Department not assigned')}</span>
+            </div>
+            <div className={`badge ${profile.role === 'admin' ? 'badge-primary' : 'badge-success'}`}>
+              {profile.role}
             </div>
           </div>
 
@@ -266,7 +335,7 @@ const Profile = () => {
             <div><strong>Email</strong><span>{profile.email}</span></div>
             <div><strong>Phone</strong><span>{profile.phone || 'Not added'}</span></div>
             <div><strong>Role</strong><span>{profile.role}</span></div>
-            <div><strong>Last Updated</strong><span>{new Date(profile.updatedAt).toLocaleDateString()}</span></div>
+            <div><strong>Last Updated</strong><span>{profile.updatedAt ? new Date(profile.updatedAt).toLocaleDateString() : 'Recently updated'}</span></div>
           </div>
 
           <div className="profile-completion-card">
@@ -305,10 +374,18 @@ const Profile = () => {
                     <label>Designation</label>
                     <input value={editForm.designation} onChange={(e) => setEditForm((prev) => ({ ...prev, designation: e.target.value }))} />
                   </div>
-                  <div className="form-group">
-                    <label>Department</label>
-                    <input value={editForm.department} onChange={(e) => setEditForm((prev) => ({ ...prev, department: e.target.value }))} disabled={!isAdminView && !isOwnProfile} />
-                  </div>
+
+                  {!isAdminSelfProfile ? (
+                    <div className="form-group">
+                      <label>Department</label>
+                      <input
+                        value={editForm.department}
+                        onChange={(e) => setEditForm((prev) => ({ ...prev, department: e.target.value }))}
+                        disabled={!isAdminView && !isOwnProfile}
+                      />
+                    </div>
+                  ) : null}
+
                   <div className="form-group">
                     <label>Phone</label>
                     <input value={editForm.phone} onChange={(e) => setEditForm((prev) => ({ ...prev, phone: e.target.value }))} />
@@ -320,22 +397,43 @@ const Profile = () => {
                 </>
               ) : null}
 
-              {isAdminView ? (
+              {isAdminView && !isAdminSelfProfile ? (
                 <div className="profile-admin-box">
                   <h4>Performance Input</h4>
                   <div className="form-row">
                     <div className="form-group">
                       <label>Rating</label>
-                      <input type="number" min="0" max="5" step="0.1" value={editForm.rating} onChange={(e) => setEditForm((prev) => ({ ...prev, rating: e.target.value }))} />
+                      <input
+                        type="number"
+                        min="0"
+                        max="5"
+                        step="0.1"
+                        value={editForm.rating}
+                        onChange={(e) => setEditForm((prev) => ({ ...prev, rating: e.target.value }))}
+                      />
                     </div>
                     <div className="form-group">
                       <label>Attendance %</label>
-                      <input type="number" min="0" max="100" step="0.1" value={editForm.attendancePercentage} onChange={(e) => setEditForm((prev) => ({ ...prev, attendancePercentage: e.target.value }))} />
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        value={editForm.attendancePercentage}
+                        onChange={(e) => setEditForm((prev) => ({ ...prev, attendancePercentage: e.target.value }))}
+                      />
                     </div>
                   </div>
                   <div className="form-group">
                     <label>Task Completion %</label>
-                    <input type="number" min="0" max="100" step="0.1" value={editForm.taskCompletion} onChange={(e) => setEditForm((prev) => ({ ...prev, taskCompletion: e.target.value }))} />
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      value={editForm.taskCompletion}
+                      onChange={(e) => setEditForm((prev) => ({ ...prev, taskCompletion: e.target.value }))}
+                    />
                   </div>
                   <div className="form-group">
                     <label>Admin Notes</label>
@@ -356,7 +454,7 @@ const Profile = () => {
         <div className="profile-content-col">
           <div className="glass-panel p-6 profile-tabs-card">
             <div className="profile-tabs">
-              {tabs.map((tab) => (
+              {visibleTabs.map((tab) => (
                 <button
                   key={tab}
                   type="button"
@@ -371,7 +469,29 @@ const Profile = () => {
             {activeTab === 'About' ? (
               <div className="profile-section-card">
                 <h3>About</h3>
-                <p>{profile.bio || 'No bio added yet.'}</p>
+                <p>
+                  {profile.bio || (
+                    isAdminSelfProfile
+                      ? 'Manage your name, contact details, designation, and profile photo from this page. Optional employee-specific sections have been removed to keep the admin profile focused and clean.'
+                      : 'No bio added yet.'
+                  )}
+                </p>
+                {isAdminSelfProfile ? (
+                  <div className="profile-summary-grid">
+                    <div className="profile-summary-card">
+                      <span>Primary Email</span>
+                      <strong>{profile.email}</strong>
+                    </div>
+                    <div className="profile-summary-card">
+                      <span>Phone</span>
+                      <strong>{profile.phone || 'Not added'}</strong>
+                    </div>
+                    <div className="profile-summary-card">
+                      <span>Designation</span>
+                      <strong>{profile.designation || 'Administrator'}</strong>
+                    </div>
+                  </div>
+                ) : null}
               </div>
             ) : null}
 
@@ -391,7 +511,11 @@ const Profile = () => {
                   {(profile.skills || []).length ? profile.skills.map((skill) => (
                     <span key={skill} className="profile-skill-tag">
                       {skill}
-                      {canEdit ? <button type="button" onClick={() => handleRemoveSkill(skill)}>×</button> : null}
+                      {canEdit ? (
+                        <button type="button" aria-label={`Remove ${skill}`} onClick={() => handleRemoveSkill(skill)}>
+                          x
+                        </button>
+                      ) : null}
                     </span>
                   )) : <p className="text-muted">No skills added yet.</p>}
                 </div>
@@ -476,7 +600,7 @@ const Profile = () => {
                   <div className="profile-performance-card">
                     <span>Rating</span>
                     <strong>{Number(profile.performance?.rating || 0).toFixed(1)}</strong>
-                    <div>{starLabel(Math.round(profile.performance?.rating || 0))}</div>
+                    <div>{renderStars(Math.round(profile.performance?.rating || 0))}</div>
                   </div>
                   <div className="profile-performance-card">
                     <span>Attendance</span>

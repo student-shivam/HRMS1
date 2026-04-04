@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import './Sidebar.css';
+import { APP_NAME, APP_TAGLINE } from '../utils/branding';
 
 const Sidebar = ({ links, isOpen, setIsOpen }) => {
   const { user } = useSelector((state) => state.auth);
@@ -14,7 +15,8 @@ const Sidebar = ({ links, isOpen, setIsOpen }) => {
       ></div>
       <div className={`sidebar glass-panel ${isOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
-          <h2>HRMS</h2>
+          <h2>{APP_NAME}</h2>
+          <p className="sidebar-tagline">{APP_TAGLINE}</p>
           <p className="role-badge">{user?.role || 'Guest'}</p>
         </div>
         <nav className="sidebar-nav">

@@ -459,6 +459,10 @@
   align-items: start;
 }
 
+.profile-shell {
+  padding-top: 0.75rem;
+}
+
 .profile-sidebar-card,
 .profile-tabs-card {
   background:
@@ -513,6 +517,8 @@
   margin: 0;
   color: #fff;
   font-size: 1.7rem;
+  line-height: 1.15;
+  word-break: break-word;
 }
 
 .profile-hero-copy p {
@@ -524,6 +530,7 @@
 .profile-hero-copy span {
   color: #94a3b8;
   font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .profile-meta-list {
@@ -630,6 +637,42 @@
 .profile-section-card p {
   color: #cbd5e1;
   line-height: 1.7;
+  font-size: 1.02rem;
+  max-width: 60ch;
+}
+
+.profile-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.9rem;
+  margin-top: 1.25rem;
+  align-items: stretch;
+}
+
+.profile-summary-card {
+  padding: 1rem;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.06);
+  min-width: 0;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.profile-summary-card span {
+  display: block;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  margin-bottom: 0.45rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.profile-summary-card strong {
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .profile-section-header {
@@ -638,6 +681,11 @@
   align-items: center;
   gap: 1rem;
   margin-bottom: 1rem;
+}
+
+.profile-content-col,
+.profile-tabs-card {
+  min-width: 0;
 }
 
 .profile-inline-actions {
@@ -805,6 +853,10 @@
   .profile-sidebar-card {
     position: static;
   }
+
+  .profile-shell {
+    padding-top: 0.25rem;
+  }
 }
 
 @media (max-width: 768px) {
@@ -812,6 +864,10 @@
   .profile-performance-grid {
     grid-template-columns: 1fr;
     display: grid;
+  }
+
+  .profile-summary-grid {
+    grid-template-columns: 1fr;
   }
 
   .profile-document-grid {

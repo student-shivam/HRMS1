@@ -50,6 +50,22 @@ const getConversationSubtitle = (conversation, onlineUsers, typingState) => {
   return onlineUsers.includes(String(conversation._id)) ? 'Online' : (conversation.role || conversation.subtitle || 'Offline');
 };
 
+const dedupeMessages = (items) => {
+  const messageMap = new Map();
+
+  items.forEach((item) => {
+    if (!item?._id) return;
+    messageMap.set(String(item._id), {
+      ...(messageMap.get(String(item._id)) || {}),
+      ...item
+    });
+  });
+
+  return Array.from(messageMap.values()).sort((a, b) => (
+    new Date(a.createdAt || a.timestamp || 0).getTime() - new Date(b.createdAt || b.timestamp || 0).getTime()
+  ));
+};
+
 const Chat = () => {
   const { user } = useSelector((state) => state.auth);
   const { socket } = useSocket() || {};
@@ -107,7 +123,7 @@ const Chat = () => {
         ? `/chat/group/${conversation._id}`
         : `/chat/direct/${conversation._id}`;
       const res = await api.get(endpoint);
-      setMessages(res.data.data || []);
+      setMessages(dedupeMessages(res.data.data || []));
       setStatusMsg('');
     } catch (err) {
       setStatusMsg(getApiErrorMessage(err, 'Failed to load conversation'));
@@ -163,11 +179,7 @@ const Chat = () => {
           return prev;
         }
 
-        if (prev.some((item) => String(item._id) === String(incoming._id))) {
-          return prev.map((item) => String(item._id) === String(incoming._id) ? { ...item, ...incoming } : item);
-        }
-
-        return [...prev, incoming];
+        return dedupeMessages([...prev, incoming]);
       });
     };
 
@@ -348,7 +360,7 @@ const Chat = () => {
         }
       });
 
-      setMessages((prev) => [...prev, res.data.data]);
+      setMessages((prev) => dedupeMessages([...prev, res.data.data]));
       setMessageText('');
       setSelectedFile(null);
       setShowEmojiPicker(false);
@@ -365,7 +377,7 @@ const Chat = () => {
   const handleEditSubmit = async (messageId) => {
     try {
       const res = await api.put(`/chat/edit/${messageId}`, { messageText: editingText });
-      setMessages((prev) => prev.map((item) => String(item._id) === String(messageId) ? res.data.data : item));
+      setMessages((prev) => dedupeMessages(prev.map((item) => String(item._id) === String(messageId) ? res.data.data : item)));
       setEditingMessageId('');
       setEditingText('');
       fetchBootstrap();

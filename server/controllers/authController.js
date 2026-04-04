@@ -2,11 +2,12 @@ const User = require('../models/User');
 const Notification = require('../models/Notification');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
+const APP_NAME = process.env.APP_NAME || 'RavindraNexus';
 
 // Generate JWT Token
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE,
+  return jwt.sign({ id }, process.env.JWT_SECRET || 'secret_key', {
+    expiresIn: process.env.JWT_EXPIRE || '30d',
   });
 };
 
@@ -49,8 +50,8 @@ const notifyUserApprovalDecision = async (req, user, status) => {
     const notification = await Notification.create({
       recipient: user._id,
       message: status === 'approved'
-        ? 'Your HRMS account has been approved. You can now sign in.'
-        : 'Your HRMS account request has been rejected. Please contact Admin/HR.',
+        ? `Your ${APP_NAME} account has been approved. You can now sign in.`
+        : `Your ${APP_NAME} account request has been rejected. Please contact Admin/HR.`,
       type: 'system',
       link: '/login'
     });
@@ -91,6 +92,8 @@ const serializeAuthUser = (user) => ({
 exports.register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
+    const normalizedRole = role === 'admin' ? 'admin' : 'employee';
+    const isAdmin = normalizedRole === 'admin';
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -101,16 +104,20 @@ exports.register = async (req, res) => {
       name,
       email,
       password,
-      role,
-      status: 'pending',
-      isApproved: false
+      role: normalizedRole,
+      status: isAdmin ? 'approved' : 'pending',
+      isApproved: isAdmin
     });
 
-    await notifyAdminsForApproval(req, user);
+    if (!isAdmin) {
+      await notifyAdminsForApproval(req, user);
+    }
 
     res.status(201).json({
       success: true,
-      message: 'Registration submitted successfully. Your account is pending approval from Admin/HR.',
+      message: isAdmin
+        ? 'Admin account created successfully. You can sign in now.'
+        : 'Registration submitted successfully. Waiting for admin approval.',
       user: {
         _id: user._id,
         id: user._id,
@@ -149,10 +156,10 @@ exports.login = async (req, res) => {
       });
     }
 
-    if (user.status === 'pending' || user.isApproved === false) {
+    if (user.role !== 'admin' && !user.isApproved) {
       return res.status(403).json({
         success: false,
-        message: 'Your account is pending approval from Admin/HR'
+        message: 'Waiting for admin approval'
       });
     }
 
@@ -217,10 +224,8 @@ exports.getUsers = async (req, res) => {
   try {
     const users = await User.find({
       role: 'employee',
-      $or: [
-        { status: 'approved', isApproved: true },
-        { status: { $exists: false }, isApproved: { $exists: false } }
-      ]
+      isApproved: true,
+      status: 'approved'
     }).select('-password');
     res.status(200).json({
       success: true,
@@ -236,7 +241,7 @@ exports.getUsers = async (req, res) => {
 // @access  Private (Admin only)
 exports.getPendingUsers = async (req, res) => {
   try {
-    const users = await User.find({ status: 'pending', isApproved: false })
+    const users = await User.find({ role: 'employee', status: 'pending', isApproved: false })
       .select('-password')
       .sort('-createdAt');
 
@@ -268,10 +273,10 @@ const updateApprovalStatus = async (req, res, status) => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    if (existingUser.role === 'admin' && status === 'rejected') {
+    if (existingUser.role === 'admin') {
       return res.status(400).json({
         success: false,
-        message: 'Admin accounts cannot be rejected from this action'
+        message: 'Admin accounts do not require approval actions'
       });
     }
 

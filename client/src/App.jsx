@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
+import { APP_NAME } from './utils/branding';
 
 // Pages
 import Login from './pages/Login';
@@ -9,6 +10,10 @@ import AdminLayout from './pages/admin/AdminLayout';
 import EmployeeLayout from './pages/employee/EmployeeLayout';
 
 const App = () => {
+  useEffect(() => {
+    document.title = APP_NAME;
+  }, []);
+
   return (
     <Router>
       <Routes>

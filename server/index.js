@@ -22,6 +22,7 @@ const holidayRoutes = require('./routes/holidayRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const Message = require('./models/Message');
 const ChatGroup = require('./models/ChatGroup');
+const APP_NAME = process.env.APP_NAME || 'RavindraNexus';
 
 dotenv.config({ path: path.join(__dirname, '.env') });
 
@@ -62,7 +63,7 @@ mongoose.connect(process.env.MONGO_URI, {
 app.get('/api/test', (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'Server is running and test API route is working correctly.'
+    message: `Welcome to ${APP_NAME} API`
   });
 });
 
@@ -331,5 +332,5 @@ process.on('uncaughtException', (error) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Server is running with Socket.io on port: ${PORT}`);
+  console.log(`${APP_NAME} server running with Socket.io on port ${PORT}`);
 });

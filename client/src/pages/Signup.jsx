@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser, clearError, clearSuccessMessage } from '../store/slices/authSlice';
 import './Auth.css';
+import { APP_NAME, APP_TAGLINE } from '../utils/branding';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -36,8 +37,8 @@ const Signup = () => {
   return (
     <div className="auth-container animate-fade-in">
       <div className="glass-panel auth-card">
-        <h2 className="auth-title">Create Account</h2>
-        <p className="auth-subtitle">Join the HRMS platform</p>
+        <h2 className="auth-title">Join {APP_NAME}</h2>
+        <p className="auth-subtitle">{APP_TAGLINE}</p>
         
         {error && <div className="auth-error">{error}</div>}
         {successMessage && <div className="status-msg success" style={{ marginBottom: '1rem' }}>{successMessage}</div>}

@@ -3,6 +3,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import api from '../../utils/api';
 import './Employee.css';
+import { APP_NAME } from '../../utils/branding';
 
 const MySalary = () => {
   const [history, setHistory] = useState([]);
@@ -32,7 +33,7 @@ const MySalary = () => {
 
     doc.setFontSize(22);
     doc.setTextColor(79, 70, 229); // var(--primary)
-    doc.text("HRMS - PAYSLIP", pageWidth / 2, 20, { align: "center" });
+    doc.text(`${APP_NAME} - PAYSLIP`, pageWidth / 2, 20, { align: "center" });
 
     doc.setFontSize(12);
     doc.setTextColor(100);
@@ -86,54 +87,46 @@ const MySalary = () => {
 
   return (
     <div className="animate-fade-in employee-page">
-      <div className="dashboard-header" style={{ marginBottom: '2.5rem' }}>
+      <div className="dashboard-header salary-page-header">
         <div>
           <h1 className="dashboard-title">Financial Overview</h1>
           <p className="dashboard-subtitle">Track your earnings, deductions, and payment history.</p>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '2rem', marginBottom: '3rem' }}>
+      <div className="salary-overview-grid">
         {/* Latest Month Highlight */}
-        <div className="glass-panel p-8" style={{ borderTop: '4px solid var(--primary)', position: 'relative' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-             <h2 style={{ fontSize: '1.5rem', margin: 0 }}>Latest Payment</h2>
+        <div className="glass-panel p-8 salary-feature-card">
+          <div className="salary-card-header">
+             <h2 className="salary-card-title">Latest Payment</h2>
              {latest && <span className="badge badge-success">{latest.month} {latest.year}</span>}
           </div>
           
           {latest ? (
             <div className="salary-snapshot-detailed">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
+              <div className="salary-metric-grid">
                 <div className="balance-item">
                   <span className="label">Base Pay</span>
                   <span className="value">${latest.baseSalary.toLocaleString()}</span>
                 </div>
                 <div className="balance-item">
                   <span className="label">Allowances / HRA</span>
-                  <span className="value" style={{color: 'var(--success)'}}>${(latest.hra + latest.allowances).toLocaleString()}</span>
+                  <span className="value salary-positive">${(latest.hra + latest.allowances).toLocaleString()}</span>
                 </div>
                 <div className="balance-item">
                   <span className="label">Bonus</span>
-                  <span className="label" style={{color: 'var(--primary-light)'}}>${latest.bonus.toLocaleString()}</span>
+                  <span className="value salary-accent">${latest.bonus.toLocaleString()}</span>
                 </div>
                 <div className="balance-item">
                   <span className="label">Deductions</span>
-                  <span className="value" style={{color: 'var(--danger)'}}>-${latest.deductions.toLocaleString()}</span>
+                  <span className="value salary-negative">-${latest.deductions.toLocaleString()}</span>
                 </div>
               </div>
               
-              <div style={{ 
-                background: 'rgba(255,255,255,0.03)', 
-                padding: '1.5rem', 
-                borderRadius: '12px', 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center',
-                border: '1px solid var(--border-glass)'
-              }}>
-                <div>
-                  <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Net Amount Credited</span>
-                  <span style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--success)' }}>${latest.netSalary.toLocaleString()}</span>
+              <div className="salary-total-card">
+                <div className="salary-total-copy">
+                  <span>Net Amount Credited</span>
+                  <strong>${latest.netSalary.toLocaleString()}</strong>
                 </div>
                 <button 
                   className="btn btn-primary" 
@@ -145,28 +138,28 @@ const MySalary = () => {
               </div>
             </div>
           ) : (
-            <div className="text-center py-10 text-muted">No payment records found yet.</div>
+            <div className="salary-empty-state">No payment records found yet.</div>
           )}
         </div>
 
         {/* Current Salary Configuration */}
-        <div className="glass-panel p-8">
-           <h3 style={{ marginBottom: '1.5rem' }}>Active Configuration</h3>
+        <div className="glass-panel p-8 salary-config-card">
+           <h3 className="salary-card-title salary-card-title-sm">Active Configuration</h3>
            {settings ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div className="salary-config-list">
+                <div className="salary-config-row">
                   <span className="text-muted">Monthly Base</span>
                   <span className="text-main font-bold">${settings.base.toLocaleString()}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div className="salary-config-row">
                   <span className="text-muted">HRA (House Rent)</span>
                   <span className="text-main">${settings.details?.hra?.toLocaleString() || 0}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div className="salary-config-row">
                   <span className="text-muted">Other Allowances</span>
                   <span className="text-main">${settings.details?.allowances?.toLocaleString() || 0}</span>
                 </div>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '1rem', fontStyle: 'italic' }}>
+                <p className="salary-config-note">
                   * This configuration is used to generate your monthly payouts. Contact HR for any discrepancies.
                 </p>
               </div>
@@ -177,10 +170,10 @@ const MySalary = () => {
       </div>
 
       {/* History Table */}
-      <div className="glass-panel p-8">
-        <h3 style={{ marginBottom: '1.5rem' }}>Payment History</h3>
+      <div className="glass-panel p-8 salary-history-card">
+        <h3 className="salary-card-title salary-card-title-sm">Payment History</h3>
         <div className="table-wrapper">
-          <table className="modern-table" style={{ width: '100%' }}>
+          <table className="modern-table salary-history-table">
             <thead>
               <tr>
                 <th>Period</th>
@@ -197,14 +190,14 @@ const MySalary = () => {
                 <tr key={record._id}>
                   <td><strong>{record.month} {record.year}</strong></td>
                   <td>${record.baseSalary.toLocaleString()}</td>
-                  <td style={{ color: 'var(--success)' }}>+${(record.hra + record.bonus + record.allowances).toLocaleString()}</td>
-                  <td style={{ color: 'var(--danger)' }}>-${record.deductions.toLocaleString()}</td>
-                  <td><strong style={{ color: 'var(--success)' }}>${record.netSalary.toLocaleString()}</strong></td>
+                  <td className="salary-positive">+${(record.hra + record.bonus + record.allowances).toLocaleString()}</td>
+                  <td className="salary-negative">-${record.deductions.toLocaleString()}</td>
+                  <td><strong className="salary-positive">${record.netSalary.toLocaleString()}</strong></td>
                   <td><span className="badge badge-success">{record.status}</span></td>
                   <td>
                     <button 
                       className="btn btn-secondary" 
-                      style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }}
+                      style={{ padding: '0.45rem 0.9rem', fontSize: '0.8rem' }}
                       onClick={() => handleDownload(record)}
                       disabled={downloading === record._id}
                     >

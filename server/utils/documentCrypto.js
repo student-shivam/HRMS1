@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 
 const algorithm = 'aes-256-cbc';
-const secret = process.env.DOCUMENT_METADATA_SECRET || process.env.JWT_SECRET || 'hrms-document-metadata-secret';
+const secret = process.env.DOCUMENT_METADATA_SECRET || process.env.JWT_SECRET || 'ravindranexus-document-metadata-secret';
 const key = crypto.createHash('sha256').update(secret).digest();
 
 exports.encryptText = (value) => {

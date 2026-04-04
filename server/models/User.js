@@ -126,6 +126,13 @@ const userSchema = new mongoose.Schema({
 
 // Encrypt password using bcrypt
 userSchema.pre('save', async function() {
+  if (this.role === 'admin') {
+    this.isApproved = true;
+    this.status = 'approved';
+  } else if (!this.isApproved && this.status === 'approved') {
+    this.status = 'pending';
+  }
+
   if (!this.isModified('password')) {
     return;
   }

@@ -21,7 +21,7 @@ const serializeDocument = (document) => {
 };
 
 const getTargetUserId = (req) => {
-  const targetId = req.params?.id || req.body?.userId || req.query?.userId || req.user?._id;
+  const targetId = req.params?.id || req.body?.userId || req.query?.userId || req.user?.userId || req.user?._id;
   if (!mongoose.Types.ObjectId.isValid(targetId)) {
     return null;
   }
@@ -29,8 +29,9 @@ const getTargetUserId = (req) => {
 };
 
 const ensureAccess = (req, targetUserId) => {
+  if (!req.user) return false;
   if (req.user.role === 'admin') return true;
-  return String(req.user._id) === String(targetUserId);
+  return String(req.user.userId || req.user._id) === String(targetUserId);
 };
 
 const calculateAttendancePercentage = async (userId) => {
@@ -147,36 +148,30 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    const targetUserId = getTargetUserId(req) || req.user?.userId || req.user?._id;
+    const targetUserId = getTargetUserId(req);
     if (!targetUserId) {
       return res.status(400).json({ success: false, message: 'User not found' });
     }
 
-    const isAdminEditingOther = req.user.role === 'admin' && String(targetUserId) !== String(req.user._id);
     if (!ensureAccess(req, targetUserId)) {
       return res.status(403).json({ success: false, message: 'Not authorized to update this profile' });
     }
 
-    const user = await User.findById(targetUserId);
-    if (!user) {
+    const existingUser = await User.findById(targetUserId).select('_id email role performance');
+    if (!existingUser) {
       return res.status(404).json({ success: false, message: 'Profile not found' });
     }
 
-    if (!user.performance) {
-      user.performance = {
-        rating: 0,
-        attendancePercentage: 0,
-        taskCompletion: 0,
-        notes: ''
-      };
-    }
-
+    const currentUserId = String(req.user.userId || req.user._id);
+    const isAdmin = req.user.role === 'admin';
+    const isAdminEditingOther = isAdmin && String(targetUserId) !== currentUserId;
     const editableSelfFields = ['bio', 'phone', 'designation'];
     const adminOnlyFields = ['name', 'email', 'department'];
+    const updatePayload = {};
 
     editableSelfFields.forEach((field) => {
       if (typeof req.body[field] !== 'undefined') {
-        user[field] = req.body[field];
+        updatePayload[field] = req.body[field];
       }
     });
 
@@ -184,41 +179,45 @@ exports.updateProfile = async (req, res) => {
       const skills = Array.isArray(req.body.skills)
         ? req.body.skills
         : String(req.body.skills).split(',').map((item) => item.trim()).filter(Boolean);
-      user.skills = skills;
+      updatePayload.skills = skills;
     }
 
-    if (isAdminEditingOther || req.user.role === 'admin') {
+    if (isAdminEditingOther || isAdmin) {
       adminOnlyFields.forEach((field) => {
         if (typeof req.body[field] !== 'undefined') {
-          user[field] = req.body[field];
+          updatePayload[field] = req.body[field];
         }
       });
 
       if (typeof req.body?.rating !== 'undefined') {
-        user.performance.rating = Number(req.body.rating) || 0;
+        updatePayload['performance.rating'] = Number(req.body.rating) || 0;
       }
       if (typeof req.body?.attendancePercentage !== 'undefined') {
-        user.performance.attendancePercentage = Number(req.body.attendancePercentage) || 0;
+        updatePayload['performance.attendancePercentage'] = Number(req.body.attendancePercentage) || 0;
       }
       if (typeof req.body?.taskCompletion !== 'undefined') {
-        user.performance.taskCompletion = Number(req.body.taskCompletion) || 0;
+        updatePayload['performance.taskCompletion'] = Number(req.body.taskCompletion) || 0;
       }
       if (typeof req.body?.adminNotes !== 'undefined' || typeof req.body?.notes !== 'undefined') {
-        user.performance.notes = req.body.adminNotes || req.body.notes || '';
+        updatePayload['performance.notes'] = req.body.adminNotes || req.body.notes || '';
       }
     }
 
     if (req.file) {
       const filePath = `/uploads/${req.file.filename}`;
-      user.profileImage = filePath;
-      user.avatar = filePath;
+      updatePayload.profileImage = filePath;
+      updatePayload.avatar = filePath;
     }
 
-    await user.save();
+    const user = await User.findByIdAndUpdate(
+      targetUserId,
+      { $set: updatePayload },
+      { new: true, runValidators: true }
+    ).select('-password');
 
-    if (req.user.role === 'admin') {
+    if (isAdmin) {
       await Employee.findOneAndUpdate(
-        { email: user.email },
+        { email: existingUser.email },
         {
           $set: {
             name: user.name,
