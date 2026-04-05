@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const { Server } = require('socket.io');
 
 const authRoutes = require('./routes/authRoutes');
@@ -41,6 +42,12 @@ app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+const CLIENT_DIST_PATH = path.join(__dirname, '..', 'client', 'dist');
+if (fs.existsSync(CLIENT_DIST_PATH)) {
+  app.use(express.static(CLIENT_DIST_PATH));
+}
+
 app.use((req, res, next) => {
   const startedAt = Date.now();
   console.log(`[HTTP] ${req.method} ${req.originalUrl}`);
@@ -299,6 +306,30 @@ io.on('connection', (socket) => {
 app.set('io', io);
 app.set('userSockets', userSockets);
 app.set('onlineUsers', onlineUsers);
+
+app.get('/', (req, res) => {
+  if (fs.existsSync(CLIENT_DIST_PATH)) {
+    return res.sendFile(path.join(CLIENT_DIST_PATH, 'index.html'));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: `${APP_NAME} API is running`
+  });
+});
+
+app.use((req, res, next) => {
+  if (req.method !== 'GET') return next();
+  if (req.originalUrl.startsWith('/api/') || req.originalUrl.startsWith('/uploads/') || req.originalUrl.startsWith('/socket.io/')) {
+    return next();
+  }
+
+  if (fs.existsSync(CLIENT_DIST_PATH)) {
+    return res.sendFile(path.join(CLIENT_DIST_PATH, 'index.html'));
+  }
+
+  next();
+});
 
 app.use((req, res) => {
   res.status(404).json({

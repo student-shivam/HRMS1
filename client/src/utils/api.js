@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const DEFAULT_API_ORIGIN = 'http://localhost:5001';
+const DEFAULT_API_ORIGIN = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5001/api' : '/api');
 
 const normalizeApiBaseUrl = (value) => {
-  const rawValue = value || `${DEFAULT_API_ORIGIN}/api`;
+  const rawValue = value ? value : DEFAULT_API_ORIGIN;
   return rawValue.endsWith('/api') ? rawValue : `${rawValue.replace(/\/$/, '')}/api`;
 };
 

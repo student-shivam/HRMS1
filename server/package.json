@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "postinstall": "if [ -d ../client ]; then cd ../client && npm install && npm run build; fi",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -18,11 +19,11 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "ejs": "^5.0.1",
-    "express": "^5.2.1",
+    "express": "^4.18.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.3.1",
     "multer": "^2.1.1",
-    "puppeteer": "^24.40.0",
+    "puppeteer-core": "^24.40.0",
     "react-chartjs-2": "^5.3.1",
     "socket.io": "^4.8.3"
   }
