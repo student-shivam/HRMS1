@@ -1,6 +1,7 @@
 # RavindraNexus HRMS
 
 RavindraNexus HRMS is a full-stack Human Resource Management System built for organizations that need a single place to manage employee operations, approvals, attendance, salary records, documents, reporting, and internal communication.
+LIVE LINk=https://ravindrahrms.netlify.app/
 
 The project has:
 
