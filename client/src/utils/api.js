@@ -44,7 +44,17 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    const status = error.response?.status;
     const message = getApiErrorMessage(error, 'API request failed');
+    
+    // Auto-logout if token is invalid or expired (401)
+    if (status === 401 && !error.config.url.includes('/auth/login')) {
+      console.warn('[API] Unauthorized access detected, clearing session...');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+
     console.error('API error:', message);
     error.message = message;
     return Promise.reject(error);

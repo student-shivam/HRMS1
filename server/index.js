@@ -2,10 +2,12 @@ const express = require('express');
 const http = require('http');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const cors = require('cors');
 const { Server } = require('socket.io');
+
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const authRoutes = require('./routes/authRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');

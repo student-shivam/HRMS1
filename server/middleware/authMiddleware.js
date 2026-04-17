@@ -18,12 +18,13 @@ exports.protect = async (req, res, next) => {
 
   try {
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret_key');
 
     const user = await User.findById(decoded.id);
 
     if (!user) {
-      return res.status(401).json({ success: false, message: 'Not authorized to access this route' });
+      console.warn(`[AUTH] User not found for id: ${decoded.id}`);
+      return res.status(401).json({ success: false, message: 'User not found' });
     }
 
     req.user = user;
@@ -32,7 +33,8 @@ exports.protect = async (req, res, next) => {
 
     next();
   } catch (error) {
-    return res.status(401).json({ success: false, message: 'Not authorized to access this route' });
+    console.error(`[AUTH] Token verification failed: ${error.message}`);
+    return res.status(401).json({ success: false, message: 'Invalid or expired token' });
   }
 };
 
