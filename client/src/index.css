@@ -4,6 +4,8 @@
   --bg-primary: #0A0A0F;
   --bg-secondary: #13141C;
   --bg-glass: rgba(19, 20, 28, 0.6);
+  --bg-elevated: #171923;
+  --surface-muted: rgba(255, 255, 255, 0.04);
   --border-glass: rgba(255, 255, 255, 0.06);
   --border-highlight: rgba(255, 255, 255, 0.12);
   --primary: #4F46E5;
@@ -17,6 +19,13 @@
   --text-main: #FFFFFF;
   --text-secondary: #94A3B8;
   --text-muted: #64748B;
+  --field-bg: rgba(255, 255, 255, 0.04);
+  --field-bg-hover: rgba(255, 255, 255, 0.06);
+  --field-bg-focus: rgba(255, 255, 255, 0.08);
+  --field-text: #FFFFFF;
+  --field-placeholder: rgba(255, 255, 255, 0.45);
+  --panel-text-strong: #FFFFFF;
+  --panel-text-soft: #CBD5E1;
   
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -63,6 +72,18 @@ body {
   font-family: var(--font-body);
   line-height: 1.6;
   min-height: 100vh;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+#root {
+  min-height: 100vh;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -94,30 +115,31 @@ a:hover {
 input, select, textarea {
   width: 100%;
   padding: 0.9rem 1.25rem;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--field-bg);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-md);
-  color: #FFFFFF;
+  color: var(--field-text);
   font-family: var(--font-body);
   font-size: 0.95rem;
   transition: all 0.25s ease;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  color-scheme: inherit;
 }
 select option {
-  background: #1e1e2d;
-  color: white;
+  background: var(--bg-elevated);
+  color: var(--field-text);
   padding: 10px;
 }
 input::placeholder, textarea::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--field-placeholder);
 }
 input:hover, select:hover, textarea:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--field-bg-hover);
   border-color: rgba(255, 255, 255, 0.25);
 }
 input:focus, select:focus, textarea:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--field-bg-focus);
   border-color: var(--primary);
   box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.25), inset 0 2px 4px rgba(0,0,0,0.1);
 }
@@ -199,3 +221,67 @@ label {
 .mt-4 { margin-top: 1rem; }
 .w-full { width: 100%; }
 .p-6 { padding: 1.5rem; }
+
+.mt-6 { margin-top: 1.5rem; }
+.py-10 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-primary: #f4f7fb;
+    --bg-secondary: #ffffff;
+    --bg-glass: rgba(255, 255, 255, 0.82);
+    --bg-elevated: #ffffff;
+    --surface-muted: rgba(15, 23, 42, 0.04);
+    --border-glass: rgba(15, 23, 42, 0.08);
+    --border-highlight: rgba(15, 23, 42, 0.14);
+    --text-main: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
+    --field-bg: rgba(255, 255, 255, 0.96);
+    --field-bg-hover: rgba(255, 255, 255, 1);
+    --field-bg-focus: rgba(255, 255, 255, 1);
+    --field-text: #0f172a;
+    --field-placeholder: rgba(51, 65, 85, 0.65);
+    --panel-text-strong: #0f172a;
+    --panel-text-soft: #334155;
+    --shadow-sm: 0 8px 24px -18px rgba(15, 23, 42, 0.22);
+    --shadow-md: 0 18px 40px -24px rgba(15, 23, 42, 0.2);
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 0% 0%, rgba(79, 70, 229, 0.08), transparent 42%),
+      radial-gradient(circle at 100% 100%, rgba(225, 29, 72, 0.06), transparent 40%);
+    color: var(--text-main);
+  }
+
+  .glass-panel {
+    background: var(--bg-glass);
+  }
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 15px;
+  }
+
+  body {
+    background-attachment: scroll;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .btn {
+    min-height: 44px;
+    width: 100%;
+  }
+
+  .p-6 {
+    padding: 1rem;
+  }
+}

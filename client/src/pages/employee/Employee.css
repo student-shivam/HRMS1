@@ -9,7 +9,7 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  height: 100vh;
+  min-height: 100dvh;
 }
 
 .main-content {
@@ -104,7 +104,7 @@
 
 @media (max-width: 768px) {
   .main-content {
-    padding: 1.5rem;
+    padding: 1.1rem 0.9rem 1.5rem;
   }
 }
 
@@ -211,6 +211,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.9rem;
+  gap: 1rem;
 }
 
 .salary-page-header {
@@ -432,12 +433,61 @@
 }
 
 @media (max-width: 1024px) {
+  .welcome-section,
+  .dashboard-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
   .salary-overview-grid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
+  .page-header,
+  .salary-page-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-header h1,
+  .welcome-text h1 {
+    font-size: 1.8rem;
+  }
+
+  .page-header p,
+  .welcome-text p {
+    font-size: 0.95rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .stat-card {
+    padding: 1.2rem 1rem;
+  }
+
+  .stat-value {
+    font-size: 2.4rem;
+  }
+
+  .leave-balance-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .salary-row,
+  .salary-total {
+    flex-wrap: wrap;
+  }
+
   .salary-card-title {
     font-size: 1.45rem;
   }
@@ -458,6 +508,11 @@
 
   .salary-empty-state {
     min-height: 180px;
+    padding: 1rem;
+  }
+
+  .info-card,
+  .quick-actions-panel {
     padding: 1rem;
   }
 }
@@ -1082,6 +1137,7 @@
   .calendar-nav-controls {
     width: 100%;
     justify-content: center;
+    flex-wrap: wrap;
   }
 
   .calendar-weekdays {
@@ -1440,8 +1496,12 @@
 }
 
 @media (max-width: 640px) {
+  .chat-panel-heading,
   .chat-header {
     padding: 1rem;
+  }
+
+  .chat-header {
     align-items: flex-start;
   }
 
@@ -1464,6 +1524,20 @@
 
   .chat-input .btn {
     width: 100%;
+  }
+
+  .chat-sidebar,
+  .chat-main {
+    border-radius: 18px;
+  }
+
+  .chat-create-group-btn {
+    width: 100%;
+  }
+
+  .chat-panel-heading h3,
+  .chat-header h3 {
+    font-size: 1.35rem;
   }
 }
 
@@ -1893,5 +1967,23 @@
 
   .document-upload-panel {
     position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .document-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .document-actions {
+    flex-direction: column;
+  }
+
+  .document-actions .btn {
+    width: 100%;
+  }
+
+  .document-drop-zone {
+    padding: 1.15rem 0.85rem;
   }
 }

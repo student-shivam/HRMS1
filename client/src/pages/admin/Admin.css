@@ -10,7 +10,7 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  height: 100vh;
+  min-height: 100dvh;
 }
 
 .main-content {
@@ -151,6 +151,7 @@
   align-items: center;
   margin-bottom: 1.5rem;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .search-box {
@@ -179,6 +180,7 @@
 
 .table-wrapper {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-glass);
   background: rgba(0,0,0,0.15);
@@ -186,6 +188,7 @@
 
 .modern-table {
   width: 100%;
+  min-width: 720px;
   border-collapse: collapse;
   text-align: left;
 }
@@ -250,6 +253,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .btn-sm {
@@ -445,10 +449,107 @@
   .chart-wrapper { min-height: 240px; }
 }
 @media (max-width: 768px) {
+  .main-content {
+    padding: 1.1rem 0.9rem 1.5rem;
+  }
+
   .dashboard-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
+  }
+
+  .dashboard-title {
+    font-size: 1.7rem;
+  }
+
+  .dashboard-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .metric-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .metric-card {
+    padding: 1.1rem 1rem;
+    align-items: flex-start;
+  }
+
+  .metric-value {
+    font-size: 1.8rem;
+  }
+
+  .table-controls,
+  .search-box,
+  .filter-box,
+  .filter-box select {
+    width: 100%;
+    max-width: none;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+  }
+
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-container {
+    max-width: none;
+    border-radius: 20px 20px 0 0;
+    max-height: 90dvh;
+    overflow-y: auto;
+  }
+
+  .modal-header,
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .modal-footer {
+    flex-direction: column-reverse;
+    padding-top: 1rem;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .recent-activity-panel,
+  .chart-container {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .main-content {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .dashboard-title {
+    font-size: 1.45rem;
+  }
+
+  .modern-table th,
+  .modern-table td {
+    padding: 0.85rem 0.9rem;
+  }
+
+  .td-user {
+    gap: 0.65rem;
+  }
+
+  .badge {
+    font-size: 0.68rem;
   }
 }
 
@@ -467,7 +568,7 @@
 .profile-tabs-card {
   background:
     radial-gradient(circle at top right, rgba(99, 102, 241, 0.12), transparent 28%),
-    linear-gradient(180deg, rgba(17, 19, 28, 0.96), rgba(12, 14, 22, 0.98));
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-secondary) 94%, transparent), color-mix(in srgb, var(--bg-primary) 96%, transparent));
 }
 
 .profile-sidebar-card {
@@ -515,7 +616,7 @@
 
 .profile-hero-copy h2 {
   margin: 0;
-  color: #fff;
+  color: var(--panel-text-strong);
   font-size: 1.7rem;
   line-height: 1.15;
   word-break: break-word;
@@ -523,12 +624,12 @@
 
 .profile-hero-copy p {
   margin: 0.35rem 0 0.2rem;
-  color: #cbd5e1;
+  color: var(--panel-text-soft);
   font-weight: 600;
 }
 
 .profile-hero-copy span {
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   line-height: 1.5;
 }
@@ -557,7 +658,7 @@
 }
 
 .profile-meta-list span {
-  color: #f8fafc;
+  color: var(--panel-text-strong);
   font-size: 0.92rem;
 }
 
@@ -567,7 +668,7 @@
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.06);
   margin-bottom: 1.25rem;
-  color: #f8fafc;
+  color: var(--panel-text-strong);
 }
 
 .profile-edit-form {
@@ -580,8 +681,8 @@
   width: 100%;
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.04);
-  color: #fff;
+  background: var(--field-bg);
+  color: var(--field-text);
   padding: 0.9rem 1rem;
   resize: vertical;
 }
@@ -595,7 +696,7 @@
 
 .profile-admin-box h4 {
   margin: 0 0 0.9rem;
-  color: #fff;
+  color: var(--panel-text-strong);
 }
 
 .profile-tabs {
@@ -609,7 +710,7 @@
   border: none;
   border-radius: 999px;
   background: rgba(255,255,255,0.05);
-  color: #cbd5e1;
+  color: var(--panel-text-soft);
   padding: 0.72rem 1.1rem;
   font-weight: 700;
   cursor: pointer;
@@ -630,12 +731,12 @@
 
 .profile-section-card h3 {
   margin-top: 0;
-  color: #fff;
+  color: var(--panel-text-strong);
   font-size: 1.2rem;
 }
 
 .profile-section-card p {
-  color: #cbd5e1;
+  color: var(--panel-text-soft);
   line-height: 1.7;
   font-size: 1.02rem;
   max-width: 60ch;
@@ -668,7 +769,7 @@
 }
 
 .profile-summary-card strong {
-  color: #fff;
+  color: var(--panel-text-strong);
   font-size: 1rem;
   line-height: 1.45;
   overflow-wrap: anywhere;
@@ -751,7 +852,7 @@
 
 .profile-exp-body h4 {
   margin: 0;
-  color: #fff;
+  color: var(--panel-text-strong);
 }
 
 .profile-exp-body strong,
@@ -760,12 +861,12 @@
 }
 
 .profile-exp-body strong {
-  color: #cbd5e1;
+  color: var(--panel-text-soft);
   margin-top: 0.4rem;
 }
 
 .profile-exp-body span {
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 0.85rem;
   margin-top: 0.22rem;
 }
@@ -792,12 +893,12 @@
 }
 
 .profile-doc-card strong {
-  color: #fff;
+  color: var(--panel-text-strong);
 }
 
 .profile-doc-card span,
 .profile-doc-card small {
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 
 .profile-doc-actions {
@@ -828,7 +929,7 @@
 }
 
 .profile-performance-card strong {
-  color: #fff;
+  color: var(--panel-text-strong);
   font-size: 1.6rem;
 }
 
@@ -842,7 +943,7 @@
 
 .profile-admin-note h4 {
   margin-top: 0;
-  color: #fff;
+  color: var(--panel-text-strong);
 }
 
 @media (max-width: 1024px) {
@@ -872,5 +973,37 @@
 
   .profile-document-grid {
     grid-template-columns: 1fr;
+  }
+
+  .profile-tabs {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .profile-tab-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .profile-inline-actions input {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .profile-shell {
+    padding-top: 0;
+  }
+
+  .profile-sidebar-card,
+  .profile-tabs-card,
+  .profile-section-card {
+    padding: 1rem !important;
+    border-radius: 18px;
+  }
+
+  .profile-hero-copy h2 {
+    font-size: 1.4rem;
   }
 }
