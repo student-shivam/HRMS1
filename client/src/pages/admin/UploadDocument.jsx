@@ -42,11 +42,19 @@ const UploadDocument = () => {
     }
 
     setLoading(true);
-    api.get(`/documents/${selectedEmp}`)
+    const targetUserId = selectedEmployee?.linkedUserId;
+    if (!targetUserId) {
+      setDocuments([]);
+      setStatusMsg({ type: 'error', text: 'No user account is linked to this employee. Create/approve the user first.' });
+      setLoading(false);
+      return;
+    }
+
+    api.get(`/documents/${targetUserId}`)
       .then((res) => setDocuments(res.data.data))
       .catch((error) => setStatusMsg({ type: 'error', text: getApiErrorMessage(error, 'Failed to load employee documents') }))
       .finally(() => setLoading(false));
-  }, [selectedEmp]);
+  }, [selectedEmp, selectedEmployee]);
 
   const setFileState = (file) => {
     if (!file) return;

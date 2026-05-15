@@ -24,7 +24,7 @@ router.get('/my/salary-slip', getMySalarySlip);
 
 // Admin / Core Employee management routes
 router.route('/')
-  .get(getEmployees)
+  .get(authorize('admin'), getEmployees)
   .post(authorize('admin'), addEmployee);
 
 router.route('/:id')

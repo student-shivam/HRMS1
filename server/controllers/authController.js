@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Employee = require('../models/Employee');
 const Notification = require('../models/Notification');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
@@ -280,12 +281,45 @@ const updateApprovalStatus = async (req, res, status) => {
       });
     }
 
+    if (status === 'approved') {
+      const department = String(req.body?.department || '').trim();
+      const salaryValue = typeof req.body?.salary === 'number' ? req.body.salary : Number(req.body?.salary);
+      const salary = Number.isFinite(salaryValue) ? salaryValue : NaN;
+
+      if (!department) {
+        return res.status(400).json({
+          success: false,
+          message: 'Department is required to approve an employee account'
+        });
+      }
+      if (!Number.isFinite(salary) || salary <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Valid salary is required to approve an employee account'
+        });
+      }
+
+      await Employee.findOneAndUpdate(
+        { email: existingUser.email },
+        {
+          $set: {
+            name: existingUser.name,
+            email: existingUser.email,
+            department,
+            salary
+          }
+        },
+        { upsert: true, new: true, runValidators: true }
+      );
+    }
+
     const user = await User.findByIdAndUpdate(
       id,
       {
         $set: {
           status,
-          isApproved: status === 'approved'
+          isApproved: status === 'approved',
+          ...(status === 'approved' && req.body?.department ? { department: String(req.body.department).trim() } : {})
         }
       },
       {

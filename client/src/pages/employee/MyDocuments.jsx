@@ -27,6 +27,11 @@ const MyDocuments = () => {
     [documents]
   );
 
+  const offerLetter = useMemo(
+    () => sortedDocuments.find((doc) => doc.documentType === 'Offer Letter') || null,
+    [sortedDocuments]
+  );
+
   const fetchDocuments = async () => {
     try {
       const res = await api.get('/documents/my');
@@ -195,7 +200,23 @@ const MyDocuments = () => {
         </div>
 
         <div className="glass-panel p-6">
-          <h3 style={{ marginBottom: '1.25rem' }}>My Documents</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+            <div>
+              <h3 style={{ margin: 0 }}>My Documents</h3>
+              <p className="text-muted" style={{ margin: '0.35rem 0 0' }}>Your verified docs will appear here automatically.</p>
+            </div>
+            {offerLetter ? (
+              <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                <span className="badge badge-success">Offer Letter Ready</span>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => handleProtectedOpen(offerLetter.previewUrl)}>
+                  Preview
+                </button>
+                <button type="button" className="btn btn-primary btn-sm" onClick={() => handleProtectedOpen(offerLetter.downloadUrl, offerLetter.originalName)}>
+                  Download
+                </button>
+              </div>
+            ) : null}
+          </div>
           {loading ? (
             <div className="text-center py-10"><div className="spinner"></div></div>
           ) : sortedDocuments.length === 0 ? (

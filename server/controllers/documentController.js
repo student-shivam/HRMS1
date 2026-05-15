@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const Employee = require('../models/Employee');
 const Document = require('../models/Document');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 const { encryptText, decryptText } = require('../utils/documentCrypto');
 const APP_NAME = process.env.APP_NAME || 'RavindraNexus';
 
@@ -285,10 +286,15 @@ exports.generateOfferLetter = async (req, res) => {
     const fileName = `offer_${employee._id}_${Date.now()}.pdf`;
     const absolutePath = path.join(uploadsRoot, fileName);
 
-    const browser = await puppeteer.launch({
+    const launchOptions = {
       headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    };
+    if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+      launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+    }
+
+    const browser = await puppeteer.launch(launchOptions);
     const page = await browser.newPage();
     await page.setContent(htmlContent);
     await page.pdf({
@@ -311,6 +317,20 @@ exports.generateOfferLetter = async (req, res) => {
       uploadedByRole: req.user.role === 'admin' ? 'admin' : 'employee',
       status: 'Verified',
     });
+
+    const notification = await Notification.create({
+      recipient: linkedUser._id,
+      message: 'Your offer letter has been generated and added to your Document Vault.',
+      type: 'document',
+      link: '/employee/documents'
+    });
+
+    const io = req.app.get('io');
+    const userSockets = req.app.get('userSockets');
+    const userSocketId = userSockets?.get(String(linkedUser._id));
+    if (userSocketId && io) {
+      io.to(userSocketId).emit('newNotification', notification);
+    }
 
     res.status(200).json({
       success: true,
