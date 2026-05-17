@@ -9,7 +9,7 @@ const documentSchema = new mongoose.Schema({
   },
   documentType: {
     type: String,
-    enum: ['Aadhaar', 'Resume', 'Certificate', 'Other', 'Offer Letter'],
+    enum: ['Aadhaar', 'Resume', 'Certificate', 'Other', 'Offer Letter', 'Joining Letter'],
     required: true,
   },
   displayName: {
@@ -47,6 +47,10 @@ const documentSchema = new mongoose.Schema({
     type: String,
     enum: ['Pending', 'Verified', 'Rejected'],
     default: 'Pending',
+  },
+  fileData: {
+    type: String,
+    required: false,
   },
 }, {
   timestamps: true

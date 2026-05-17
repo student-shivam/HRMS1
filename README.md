@@ -582,4 +582,4 @@ If you want, I can also make the next version of this README more polished with:
 - screenshots section
 - API examples with request/response
 - contributor and license sections
-- Hindi + English mixed documentation style
+

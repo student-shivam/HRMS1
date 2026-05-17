@@ -23,6 +23,7 @@ const chatRoutes = require('./routes/chatRoutes');
 const calendarRoutes = require('./routes/calendarRoutes');
 const holidayRoutes = require('./routes/holidayRoutes');
 const profileRoutes = require('./routes/profileRoutes');
+const companyProfileRoutes = require('./routes/companyProfileRoutes');
 const Message = require('./models/Message');
 const ChatGroup = require('./models/ChatGroup');
 const APP_NAME = process.env.APP_NAME || 'RavindraNexus';
@@ -60,8 +61,8 @@ const io = new Server(server, {
 });
 
 app.use(cors(corsOptions));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const CLIENT_DIST_PATH = path.join(__dirname, '..', 'client', 'dist');
@@ -118,6 +119,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/messages', chatRoutes);
 app.use('/api/calendar', calendarRoutes);
 app.use('/api/holidays', holidayRoutes);
+app.use('/api/company-profile', companyProfileRoutes);
 
 const userSockets = new Map();
 const onlineUsers = new Set();

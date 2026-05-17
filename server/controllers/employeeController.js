@@ -1,6 +1,7 @@
 const Employee = require('../models/Employee');
 const Attendance = require('../models/Attendance');
 const Leave = require('../models/Leave');
+const fs = require('fs');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
 const Document = require('../models/Document');
@@ -184,6 +185,9 @@ exports.uploadDocument = async (req, res) => {
 
     const displayName = String(req.body.displayName || req.body.name || path.parse(req.file.originalname).name).trim() || 'Document';
 
+    const fileBuffer = fs.readFileSync(req.file.path);
+    const fileBase64 = fileBuffer.toString('base64');
+
     const document = await Document.create({
       employeeId: linkedUser._id,
       documentType,
@@ -194,7 +198,8 @@ exports.uploadDocument = async (req, res) => {
       fileSize: req.file.size,
       uploadedBy: req.user._id,
       uploadedByRole: 'admin',
-      status: 'Verified'
+      status: 'Verified',
+      fileData: fileBase64,
     });
 
     // Create Notification for the specific User matching the Employee's email

@@ -32,6 +32,11 @@ const MyDocuments = () => {
     [sortedDocuments]
   );
 
+  const joiningLetter = useMemo(
+    () => sortedDocuments.find((doc) => doc.documentType === 'Joining Letter') || null,
+    [sortedDocuments]
+  );
+
   const fetchDocuments = async () => {
     try {
       const res = await api.get('/documents/my');
@@ -205,17 +210,30 @@ const MyDocuments = () => {
               <h3 style={{ margin: 0 }}>My Documents</h3>
               <p className="text-muted" style={{ margin: '0.35rem 0 0' }}>Your verified docs will appear here automatically.</p>
             </div>
-            {offerLetter ? (
-              <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                <span className="badge badge-success">Offer Letter Ready</span>
-                <button type="button" className="btn btn-secondary btn-sm" onClick={() => handleProtectedOpen(offerLetter.previewUrl)}>
-                  Preview
-                </button>
-                <button type="button" className="btn btn-primary btn-sm" onClick={() => handleProtectedOpen(offerLetter.downloadUrl, offerLetter.originalName)}>
-                  Download
-                </button>
-              </div>
-            ) : null}
+            <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
+              {offerLetter && (
+                <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                  <span className="badge badge-success">Offer Letter Ready</span>
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => handleProtectedOpen(offerLetter.previewUrl)}>
+                    Preview
+                  </button>
+                  <button type="button" className="btn btn-primary btn-sm" onClick={() => handleProtectedOpen(offerLetter.downloadUrl, offerLetter.originalName)}>
+                    Download
+                  </button>
+                </div>
+              )}
+              {joiningLetter && (
+                <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                  <span className="badge badge-success" style={{ background: '#4f46e5' }}>Joining Letter Ready</span>
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => handleProtectedOpen(joiningLetter.previewUrl)}>
+                    Preview
+                  </button>
+                  <button type="button" className="btn btn-primary btn-sm" onClick={() => handleProtectedOpen(joiningLetter.downloadUrl, joiningLetter.originalName)}>
+                    Download
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
           {loading ? (
             <div className="text-center py-10"><div className="spinner"></div></div>

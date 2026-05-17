@@ -7,6 +7,7 @@ import Employees from './Employees';
 import Leaves from './Leaves';
 import UploadDocument from './UploadDocument';
 import GenerateDocument from './GenerateDocument';
+import CompanyProfileSettings from './CompanyProfileSettings';
 import AttendanceAdmin from './AttendanceAdmin';
 import Tasks from './Tasks';
 import SalaryAdmin from './SalaryAdmin';
@@ -28,6 +29,7 @@ const adminLinks = [
   { path: '/admin/documents', label: 'Upload Docs', icon: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12' },
   { path: '/admin/reports', label: 'Reports', icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
   { path: '/admin/generate-offer', label: 'Generate Offer', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
+  { path: '/admin/company-profile', label: 'Company Settings', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
   { path: '/admin/profile', label: 'My Profile', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' }
 ];
 
@@ -52,6 +54,7 @@ const AdminLayout = () => {
             <Route path="/documents" element={<UploadDocument />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/generate-offer" element={<GenerateDocument />} />
+            <Route path="/company-profile" element={<CompanyProfileSettings />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:id" element={<Profile />} />
           </Routes>

@@ -1,6 +1,7 @@
 const express = require('express');
 const {
   generateOfferLetter,
+  generateJoiningLetter,
   uploadDocument,
   getMyDocuments,
   getEmployeeDocuments,
@@ -16,6 +17,7 @@ const router = express.Router();
 router.use(protect);
 
 router.post('/generate-offer', authorize('admin'), generateOfferLetter);
+router.post('/generate-joining', authorize('admin'), generateJoiningLetter);
 router.post('/upload', uploadDoc.single('file'), uploadDocument);
 router.get('/my', getMyDocuments);
 router.get('/preview/:id', previewDocument);
